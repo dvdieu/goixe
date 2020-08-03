@@ -24,7 +24,7 @@ class DriverServices {
         return false;
     }
 
-    static async get(id) {
+    static async    get(id) {
         return Driver.findById(id);
     }
 

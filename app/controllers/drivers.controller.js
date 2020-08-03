@@ -79,7 +79,7 @@ module.exports = {
     },
     details: async (req, res) => {
         try {
-            let user = await driverServices.get(req.id);
+            let user = await driverServices.get(req.params.id);
             if (user) {
                 res.send({
                     "status": "OK",
