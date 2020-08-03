@@ -12,7 +12,15 @@ class TripServices {
         }
         catch (e) {
             throw e
-
+        }
+        return false;
+    }
+    static getById(id){
+        try {
+            return Trip.findById(id);
+        }
+        catch (e) {
+            throw e
         }
         return false;
     }
