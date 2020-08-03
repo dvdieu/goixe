@@ -52,12 +52,12 @@ const redis = require('redis');
 // });
 
 
-const redisAdapter = require('socket.io-redis');
+const redisAdapter = require('./app/redis/RedisWrapper').adapter;
 /**
  * SUBS REDIS
  */
 const socketIO = require('socket.io')(server)
-socketIO.adapter(redisAdapter({ host: '13.114.129.134', port: 6379,auth_pass:"9195e640915b0b476c4699ecb9c129e4fa542181"}));
+socketIO.adapter(redisAdapter);
 
 socketIO.set('match origin protocol', true);
 
@@ -66,7 +66,6 @@ socketIO.set('origins', '*:*');
 socketIO.set('log level', 1);
 socketIO.on('connection', (socket) => {
     socket.on('disconnect', (reason) => {
-        // ...
         console.log(reason);
     });
 });
