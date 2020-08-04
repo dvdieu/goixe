@@ -1,16 +1,10 @@
 const db = require("../models");
 const Driver = db.Driver;
 const Auth = require("../helps/jwt.helper")
-
+const redis = require("../redis/RedisWrapper").crud;
 class DriverServices {
     constructor() {
     }
-
-    getHash(salt, value) {
-        let token = CryptoJS.HmacSHA1(salt, value);
-        return token;
-    }
-
     static async near(long, lat, distance) {
         try {
             return Driver.find({
@@ -44,6 +38,9 @@ class DriverServices {
     static async createNewDriver(payload) {
         let driver = new Driver(payload);
         return Driver.create(driver);
+    }
+    static async updateOnCatch(driverId,tripId){
+        return Driver.findOneAndUpdate({"_id":driverId,"status":"on"},{"status":"oncatch","in_trip_id":tripId},{new: true});
     }
 }
 

@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const tripController = require("../controllers/trip.controller");
+const tripController = require("../controllers/Trip.controller");
 const AuthMiddleWare = require("../controllers/filter/AuthToken")
 // Sử dụng authMiddleware.isAuth trước những api cần xác thực
 router.post("/create",tripController.insertTrip)

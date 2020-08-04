@@ -17,7 +17,7 @@ module.exports = mongoose => {
             direction:{type:Number,default:0},
             velocity:{type:Number,default:0},
             radius:{type:Number,default:0},
-            status:{type:Number,default:0},
+            status:{type:String,default:"on",enum:["off","oncatch","on"]},
             in_trip_id:{type:String,default:""},
             auth_id:{type:String,default:""}
         },

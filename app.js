@@ -36,8 +36,9 @@ app.get("/", (req, res) => {
     res.json({message: "Welcome to application. 0964222806"});
 });
 
-app.use('/trips', require('./app/routes/trip.routes'));
-app.use('/drivers', require('./app/routes/driver.routes'));
+app.use('/trips', require('./app/routes/Trip.routes'));
+app.use('/drivers', require('./app/routes/Driver.routes'));
+app.use('/booking', require('./app/routes/Booking.routes'));
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
@@ -71,7 +72,7 @@ socketIO.on('connection', (socket) => {
 });
 global.io = socketIO;
 const socketApplication = require("./app/config/socket")(socketIO);
-const wokerProcessEvent= require("./app/redis/wokerProcessEvent");
+const wokerProcessEvent= require("./app/redis/WokerManager");
 new wokerProcessEvent.WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
 
 

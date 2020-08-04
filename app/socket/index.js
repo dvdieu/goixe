@@ -1,3 +1,4 @@
 const socketManager = {};
-socketManager.driver = require("./socket-drivers");
+socketManager.driver = require("./SocketDrivers");
+socketManager.client = require("./SocketClients");
 module.exports = socketManager;

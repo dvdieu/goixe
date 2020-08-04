@@ -1,4 +1,4 @@
-const TripServices = require("../services/tripservices");
+const TripServices = require("../services/TripServices");
 module.exports = {
     insertTrip: async (req, res) => {
 
@@ -18,7 +18,7 @@ module.exports = {
             return;
         }
         try {
-            let tripInsert = await TripServices.TripServices.createNewTrip(req.body);
+            let tripInsert = await TripServices.createNewTrip(req.body);
             res.send({
                 "status": "OK",
                 "message": "successfull",
@@ -77,7 +77,7 @@ module.exports = {
             res.status(400).send({message: "Content can not be empty!"});
             return;
         }
-        let tripOfDriver = await Trip.findById(tripHashId);
+        let tripOfDriver = await TripServices.getById(tripHashId);
         if (tripOfDriver == null) {
             res.send({'status': 'ERROR', 'message': 'Trip not exists'})
             return;

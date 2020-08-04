@@ -1,4 +1,4 @@
-const driverServices = require("../services/driverservices").DriverServices;
+const driverServices = require("../services/DriverServices").DriverServices;
 const db = require("../models");
 const Driver = db.Driver;
 
@@ -100,6 +100,28 @@ module.exports = {
         }
     },
     gps: async (req, res) => {
+        try {
+            let user = await driverServices.updateDriver(req.auth_info.data._id, req.body);
+            if (user) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": user
+                });
+            } else {
+                res.send({
+                    "status": "ERROR",
+                    "message": "Login Error"
+                });
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": "Login Error"
+            });
+        }
+    },
+    async catchTrip(req, res) {
         try {
             let user = await driverServices.updateDriver(req.auth_info.data._id, req.body);
             if (user) {
