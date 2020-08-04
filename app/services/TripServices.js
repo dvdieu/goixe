@@ -1,43 +1,81 @@
 const db = require("../models");
 const publishEvent = require("../redis/pub");
 const Trip = db.Trip;
-module.exports={
-    async createNewTrip(payload){
+module.exports = {
+    async createNewTrip(payload) {
         try {
             let newTrip = await Trip.create(new Trip(payload));
-            publishEvent.publish("new-trip",newTrip.toJSON())
+            publishEvent.publish("new-trip", newTrip.toJSON())
             return newTrip;
-        }
-        catch (e) {
+        } catch (e) {
             throw e
         }
-        return false;
     },
-    async getById(tripId){
+    async getById(tripId) {
         try {
             return Trip.findById(tripId);
-        }
-        catch (e) {
+        } catch (e) {
             throw e
         }
-        return false;
     },
-    async cancelTrip(tripId,driverId){
+    async cancelTrip(tripId, driverId) {
         try {
-
-        }
-        catch (e){
-
+            return await Trip.findOneAndUpdate({"_id": tripId, "driverId_for_capture": {"$ne": driverId}},
+                {
+                    "$addToSet": {"driverId_for_excluded": driverId}
+                },
+                {new: true});
+        } catch (e) {
+            throw e;
         }
     },
-    async acceptTrip(tripId,driverId){
+    async catchTrip(tripId, driverId) {
         try {
-            return Trip.findOneAndUpdate({"_id":tripId},{"driverId_in_trip":driverId,"status":"initial"},{
-                new:true
+            let query = {"_id": tripId, "status": {"$in": ["draft", "initial"]}};
+            return Trip.findOneAndUpdate(query, {"driverId_for_capture": driverId, "status": "initial"}, {
+                new: true
             });
+        } catch (e) {
+            throw e;
         }
-        catch (e){
-
+    },
+    async goToCustomer(tripId, driverId) {
+        try {
+            return Trip.findOneAndUpdate({
+                "_id": tripId,
+                "driverId_for_capture": driverId,
+                "status": {"$in": ["gocustomer", "initial"]}
+            }, {"status": "gocustomer"}, {
+                new: true
+            });
+        } catch (e) {
+            throw e;
         }
-    }
+    },
+    async startTrip(tripId, driverId) {
+        try {
+            return Trip.findOneAndUpdate({
+                "_id": tripId,
+                "driverId_for_capture": driverId,
+                "status": {"$in": ["gocustomer", "initial"]}
+            }, {"status": "starttrip", "driverId_in_trip": driverId}, {
+                new: true
+            });
+        } catch (e) {
+            throw e;
+        }
+    },
+    async finishTrip(tripId, driverId) {
+        try {
+            return Trip.findOneAndUpdate({
+                "_id": tripId,
+                "driverId_in_trip": driverId,
+                "status": {"$in": ["starttrip", "finish"]}
+            }, {"status": "finish", "driverId_in_trip": "", "driverId_for_capture": ""}, {
+                new: true
+            });
+        } catch (e) {
+            throw e;
+        }
+    },
 }

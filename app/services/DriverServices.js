@@ -27,7 +27,6 @@ class DriverServices {
         if (driver == null) {
             return null;
         }
-
         return Auth.generateToken(driver);
     }
 
@@ -40,7 +39,7 @@ class DriverServices {
         return Driver.create(driver);
     }
     static async updateOnCatch(driverId,tripId){
-        return Driver.findOneAndUpdate({"_id":driverId,"status":"on"},{"status":"oncatch","in_trip_id":tripId},{new: true});
+        return Driver.findOneAndUpdate({"_id":driverId,"status":{"$in":["on","oncatch"]}},{"status":"oncatch","in_trip_id":tripId},{new: true});
     }
 }
 

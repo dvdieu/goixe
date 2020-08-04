@@ -11,6 +11,24 @@ module.exports={
             throw e;
         }
     },
+    async driverGoToCustomer(data){
+        try{
+            global.io.of("/clients").emit("goCustomer",JSON.stringify(data));
+        }
+        catch (e){
+            console.log(e);
+            throw e;
+        }
+    },
+    async startTrip(data){
+        try{
+            global.io.of("/clients").emit("startTrip",JSON.stringify(data));
+        }
+        catch (e){
+            console.log(e);
+            throw e;
+        }
+    },
     async jobHasBeenReceived(data){
         try{
             global.io.of("/clients").emit("catchTrip",JSON.stringify(data));
