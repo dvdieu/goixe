@@ -6,5 +6,6 @@ router.post("/login",driverController.login);
 router.use(AuthMiddleWare.isAuth);
 router.get("/me",driverController.me);
 router.post("/gps",driverController.gps);
-
+router.get("/on",driverController.on);
+router.get("/off",driverController.off);
 module.exports=router;

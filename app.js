@@ -39,6 +39,7 @@ app.get("/", (req, res) => {
 app.use('/trips', require('./app/routes/Trip.routes'));
 app.use('/drivers', require('./app/routes/Driver.routes'));
 app.use('/booking', require('./app/routes/Booking.routes'));
+app.use('/operations', require('./app/routes/Operation.routes'));
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {

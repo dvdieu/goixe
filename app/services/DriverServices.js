@@ -18,9 +18,31 @@ class DriverServices {
         }
         return false;
     }
+    static async nearAll(long, lat, distance) {
+        try {
+            return Driver.find({
+                "location": {
+                    $nearSphere: {$geometry: {type: 'Point', coordinates: [long, lat]}, $maxDistance: distance}
+                }
+            })
+        } catch (e) {
+            throw e;
+        }
+        return false;
+    }
 
     static async get(id) {
         return Driver.findById(id);
+    }
+
+    static async list_driver_on() {
+        return Driver.find({"status":"on"});
+    }
+    static async list_driver_on_catch() {
+        return Driver.find({"status":"oncatch"});
+    }
+    static async list_driver_off() {
+        return Driver.find({"status":"off"});
     }
 
     static async loginDriver(userName, passWord) {
@@ -33,6 +55,13 @@ class DriverServices {
 
     static async updateDriver(id, payload) {
         return Driver.findOneAndUpdate({_id: id}, payload,{new:true});
+    }
+    static async onDriver(id) {
+        return Driver.findOneAndUpdate({_id: id,"status":{$ne:"oncatch"}}, {"status":"on"},{new:true});
+    }
+
+    static async offDriver(id) {
+        return Driver.findOneAndUpdate({_id: id,"status":{$ne:"oncatch"}}, {"status":"off"},{new:true});
     }
 
     static async createNewDriver(payload) {

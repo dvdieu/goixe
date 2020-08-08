@@ -1,7 +1,7 @@
 const driverServices = require("../services/DriverServices").DriverServices;
 const db = require("../models");
 const Driver = db.Driver;
-
+const ErrorApp = require("../ErrorCode")
 module.exports = {
     register: async (req, res) => {
         // Validate request
@@ -124,6 +124,69 @@ module.exports = {
             res.send({
                 "status": "ERROR",
                 "message": "Login Error"
+            });
+        }
+    },
+    on: async (req, res) => {
+        try {
+            let user = await driverServices.onDriver(req.auth_info.data._id);
+            if (user) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": ""
+                });
+            } else {
+                let driver = await driverServices.get(req.auth_info.data._id);
+                if(driver==null){
+                    res.send({
+                        "status": "ERROR",
+                        "message":"Driver Not Exists"
+                    });
+                    return;
+                }
+                if(driver){
+                    if(driver.status==="oncatch"){
+                        throw Error(ErrorApp.YOU_HAVE_NOT_COMPLETED_THE_PREVIOUS_TRIP);
+                    }
+                }
+
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": e.message
+            });
+        }
+    },
+    off: async (req, res) => {
+        try {
+            let user = await driverServices.offDriver(req.auth_info.data._id);
+            if (user) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": user
+                });
+            } else {
+                let driver = await driverServices.get(req.auth_info.data._id);
+                if(driver==null){
+                    res.send({
+                        "status": "ERROR",
+                        "message":"Driver Not Exists"
+                    });
+                    return;
+                }
+                if(driver){
+                    if(driver.status==="oncatch"){
+                        throw Error(ErrorApp.YOU_HAVE_NOT_COMPLETED_THE_PREVIOUS_TRIP);
+                    }
+                }
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": e.message
             });
         }
     },
