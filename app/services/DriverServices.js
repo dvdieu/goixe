@@ -8,7 +8,8 @@ class DriverServices {
     static async near(long, lat, distance) {
         try {
             return Driver.find({
-                location: {
+                "status":"on",
+                "location": {
                     $nearSphere: {$geometry: {type: 'Point', coordinates: [long, lat]}, $maxDistance: distance}
                 }
             })
@@ -31,7 +32,7 @@ class DriverServices {
     }
 
     static async updateDriver(id, payload) {
-        return Driver.findOneAndUpdate({_id: id}, payload);
+        return Driver.findOneAndUpdate({_id: id}, payload,{new:true});
     }
 
     static async createNewDriver(payload) {
@@ -39,7 +40,10 @@ class DriverServices {
         return Driver.create(driver);
     }
     static async updateOnCatch(driverId,tripId){
-        return Driver.findOneAndUpdate({"_id":driverId,"status":{"$in":["on","oncatch"]}},{"status":"oncatch","in_trip_id":tripId},{new: true});
+        return Driver.findOneAndUpdate({"_id":driverId,"status":{"$in":["on"]}},{"status":"oncatch","in_trip_id":tripId},{new: true});
+    }
+    static async finishTrip(tripID, driverId){
+        return Driver.findOneAndUpdate({"_id":driverId,"status":{"$in":["oncatch"]}},{"status":"on","in_trip_id":""},{new: true});
     }
 }
 

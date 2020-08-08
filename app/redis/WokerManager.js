@@ -1,11 +1,9 @@
 const RedisWrapper = require('./RedisWrapper');
-const driverServices = require("../services/DriverServices")
-const tripServices = require("../services/TripServices")
+
 const workerTrip = require("./WorkerTrip")
 class WorkerProcessEvent {
     constructor() {
         RedisWrapper.sub.subscribe("new-trip");
-        RedisWrapper.sub.subscribe("push-notification-trip");
     }
     static sendNotify(message) {
         global.io.of('drivers').to("drivers_online").emit("catchTrip", message);

@@ -13,7 +13,10 @@ module.exports={
     },
     async driverGoToCustomer(data){
         try{
-            global.io.of("/clients").emit("goCustomer",JSON.stringify(data));
+            let message={"status":"OK","message":"Tài xế đang tới chỗ bạn","payload":data};
+
+            console.log("goCustomer"+ JSON.stringify(message));
+            global.io.of("/clients").emit("goCustomer",JSON.stringify(message));
         }
         catch (e){
             console.log(e);
@@ -22,7 +25,21 @@ module.exports={
     },
     async startTrip(data){
         try{
-            global.io.of("/clients").emit("startTrip",JSON.stringify(data));
+            let message={"status":"OK","message":"Bạn đang trong chuyến đi, chúc thượng lộ bình an","payload":data};
+            console.log("startTrip"+ JSON.stringify(message));
+            global.io.of("/clients").emit("startTrip",JSON.stringify(message));
+        }
+        catch (e){
+            console.log(e);
+            throw e;
+        }
+    },
+    async finishTrip(data){
+        try{
+
+            let message={"status":"OK","message":"Cảm ơn bạn đã lựa chọn chúng tôi! Xin chào, hẹn gặp lại","payload":data};
+            console.log("finishTrip"+ JSON.stringify(message));
+            global.io.of("/clients").emit("finishTrip",JSON.stringify(message));
         }
         catch (e){
             console.log(e);
@@ -31,7 +48,9 @@ module.exports={
     },
     async jobHasBeenReceived(data){
         try{
-            global.io.of("/clients").emit("catchTrip",JSON.stringify(data));
+            let message={"status":"OK","message":"Tài xế đã nhận cuốc xe của bạn","payload":data};
+            console.log("catchTrip"+ JSON.stringify(message));
+            global.io.of("/clients").emit("catchTrip",JSON.stringify(message));
         }
         catch (e){
             console.log(e);
@@ -48,26 +67,43 @@ module.exports={
             if (listDriver === null || listDriver === undefined || listDriver.length === 0) {
                 //global.io.of("client").emit("");
                 //Tất cả tài xế đang bận
+                let payload = {
+                    "status": "ERROR",
+                    "message": "Tất cả tài xế đang bận",
+                    "payload":{},
+                }
+                global.io.of("/managers").emit("catchTrip",JSON.stringify(payload));
                 return;
             }
             let listDriverNear = listDriver.map(function (item) {
                 return item._id.toString();
             })
 
-            RedisWrapper.crud.hmget("driver_online", listDriverNear, function (err, reply) {
-                //Create DataBase Stored For List Diver Near Trip
-                reply.forEach(function (value) {
-                    RedisWrapper.crud.hset(tripId, value, value);
-                })
-            });
-            RedisWrapper.crud.hgetall(tripId, async function (err,reply){
-                let trip = await tripServices.getById(tripId);
-                //EMIT SOCKET
-                Object.keys(reply).forEach(key => {
-                    console.log(key);
-                    global.io.of("/drivers").to(key).emit("catchTrip",JSON.stringify(trip));
+            let listDriverOnline = await RedisWrapper.crud.hmget("driver_online", listDriverNear);
+            if(listDriverOnline!=null && listDriverOnline.length>0){
+                listDriverOnline.forEach(async function (item){
+                    await RedisWrapper.crud.hset(tripId,item,item);
                 });
-            });
+                let trip = await tripServices.getById(tripId);
+                let payload = {
+                    "status":"OK",
+                    "message":"",
+                    "payload":trip
+                };
+                listDriverOnline.forEach((v,k) => {
+                    if(v) {
+                        global.io.of("/drivers").to(v).emit("catchTrip", JSON.stringify(payload));
+                    }
+                });
+            }
+            else {
+                let data={
+                    "status":"ERROR",
+                    "message":"DRIVER OUT RANGE OR NOT ONLINE"
+                }
+                console.log("catchTrip"+ data);
+                global.io.of("/clients").emit("catchTrip",JSON.stringify(data));
+            }
         }catch (e){
             console.log(e);
             throw e;
