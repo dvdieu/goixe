@@ -9,25 +9,31 @@ module.exports = {
             res.status(400).send({message: "Content can not be empty!"});
             return;
         }
-        let driverRequest = new Driver(req.body)
-        driverRequest.location = {type: "Point", coordinates: [req.body.point_lng, req.body.point_lat]};
-        let driver = await driverServices.createNewDriver(driverRequest).catch(err => {
-            if (err.code === 11000) {
+        try {
+            let driverRequest = new Driver(req.body)
+            let driver = await driverServices.createNewDriver(driverRequest).catch(err => {
+                if (err.code === 11000) {
+                    res.status(500).send({
+                        message: "User exists"
+                    });
+                    return;
+                }
                 res.status(500).send({
-                    message: "User exists"
+                    message:
+                        err.message || "Some error occurred while creating the FeedBack."
                 });
-                return;
-            }
-            res.status(500).send({
-                message:
-                    err.message || "Some error occurred while creating the FeedBack."
             });
-        });
-        res.send({
-            "status": "OK",
-            "message": "successfull",
-            "payload": driver
-        });
+            res.send({
+                "status": "OK",
+                "message": "successfull",
+                "payload": driver
+            });
+        }catch (e){
+            res.send({
+                "status": "ERROR",
+                "message": e.message
+            });
+        }
     },
     login: async (req, res) => {
         if (!req.body) {

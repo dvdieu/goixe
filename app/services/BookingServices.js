@@ -2,13 +2,14 @@ const redis = require("../redis/RedisWrapper").crud;
 const WorkerTrip = require("../redis/WorkerTrip")
 const driverServices = require("./DriverServices");
 const tripServices = require("./TripServices");
+const ERRORAPPLICATION = require("../ErrorCode")
 module.exports = {
     async catchTrip(driverId, tripId) {
         try {
             let bookingKey = "booking:" + tripId;
             let currentBooking = await redis.get(bookingKey);
             if (redis.hget(tripId, driverId) === null) {
-                return -3;// Không nằm trong danh sách tài xế được phép || hoặc dã hết hạn
+                throw new Error(ERRORAPPLICATION.THE_TRIP_HAS_BEEN_ASSIGNED_TO_ANOTHER_ASSET)
             }
             if (currentBooking === driverId) {
                 return tripServices.getById(tripId); //Đã Nhận
@@ -17,22 +18,20 @@ module.exports = {
                 let driver = await driverServices.DriverServices.updateOnCatch(driverId, tripId);
                 if (driver) {
                     let trip = await tripServices.catchTrip(tripId, driverId);
-                    let payload = {"message":"Tài xế đã nhận cuốc xe của bạn","driver": driver, "trip": trip};
+                    let payload = {"driver": driver, "trip": trip};
                     await WorkerTrip.jobHasBeenReceived(payload);
                     return trip;
                 } else {
                     redis.del(bookingKey);
-                    return -5; // Tài xế đang bận hoặc đã nhận quốc khác
+                    throw new Error(ERRORAPPLICATION.YOU_HAVE_NOT_COMPLETED_THE_PREVIOUS_TRIP)
                 }
 
             } else {
-                return -2;//Đã có người khác nhận
+                throw new Error(ERRORAPPLICATION.THE_TRIP_HAS_BEEN_ASSIGNED_TO_ANOTHER_ASSET)
             }
         } catch (e) {
-            console.log(e);
             throw e;
         }
-        return false;
     },
     async cancelTrip(driverId, tripId) {
         try {
@@ -52,7 +51,7 @@ module.exports = {
         try {
             let driver = await driverServices.DriverServices.get(driverId);
             let trip = await tripServices.goToCustomer(tripId, driverId);
-            let payload = {"message":"Tài xế đang tới chỗ bạn","driver": driver, "trip": trip};
+            let payload = {"driver": driver, "trip": trip};
             await WorkerTrip.driverGoToCustomer(payload);
             return trip;
         } catch (e) {
@@ -65,7 +64,7 @@ module.exports = {
         try {
             let driver = await driverServices.DriverServices.get(driverId);
             let trip = await tripServices.startTrip(tripID, driverId);
-            let payload = {"message":"Bạn đang trong chuyến đi, chúc thượng lộ bình an","driver": driver, "trip": trip};
+            let payload = {"driver": driver, "trip": trip};
             await WorkerTrip.startTrip(payload);
             return trip;
         } catch (e) {
@@ -77,6 +76,7 @@ module.exports = {
     async finishTrip(driverId, tripID) {
         try {
             let trip = await tripServices.finishTrip(tripID, driverId)
+            await WorkerTrip.startTrip(trip);
             return trip;
         } catch (e) {
             console.log(e);
