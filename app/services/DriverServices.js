@@ -53,6 +53,12 @@ class DriverServices {
         return Auth.generateToken(driver);
     }
 
+    static async updateGPS(driverID,long,lat,direction,velocity,radius){
+        let payloadUpdateGPS = {"type":"Point","coordinates":[long,lat]}
+        let updateQuery = {"direction":direction,"velocity":velocity,"radius":radius,"location":payloadUpdateGPS};
+        return Driver.findOneAndUpdate({_id: driverID}, updateQuery,{new:true});
+    }
+
     static async updateDriver(id, payload) {
         return Driver.findOneAndUpdate({_id: id}, payload,{new:true});
     }
@@ -76,4 +82,5 @@ class DriverServices {
     }
 }
 
-module.exports = {DriverServices};
+module.exports = {DriverServices
+};

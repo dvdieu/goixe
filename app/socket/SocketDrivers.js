@@ -15,8 +15,7 @@ let registerEvent = async (io, path) => {
             let message = JSON.stringify(socket.contextAuthenToken.data);
             nsp.emit('pong',message);
             socket.on("gps",async function (message){
-                let payloadUpdateGPS = {"type":"Point","coordinates":[message.long,message.lat]};
-                await driverService.updateDriver(socket.contextAuthenToken.data._id,{"direction":message.direction,"velocity":message.velocity,"radius":message.radius,"location":payloadUpdateGPS,"location":payloadUpdateGPS});
+                await driverService.updateGPS(socket.contextAuthenToken.data._id,message.long,message.lat,message.direction,message.velocity,message.radius);
             });
             socket.on("disconnect", async function (reason) {
                 await RedisWrapper.crud.hdel("driver_online", socket.contextAuthenToken.data._id);

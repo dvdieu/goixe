@@ -68,16 +68,7 @@ module.exports = {
     ///////////////////////////
     ///////////////////////////
     getTripById: async (req, res) => {
-        if (!req.body) {
-            res.status(400).send({message: "Content can not be empty!"});
-            return;
-        }
-        let tripHashId = req.body.tripHashId;
-        if (tripHashId == undefined || tripHashId.length == 0) {
-            res.status(400).send({message: "Content can not be empty!"});
-            return;
-        }
-        let tripOfDriver = await TripServices.getById(tripHashId);
+        let tripOfDriver = await TripServices.getById(req.params.tripId);
         if (tripOfDriver == null) {
             res.send({'status': 'ERROR', 'message': 'Trip not exists'})
             return;

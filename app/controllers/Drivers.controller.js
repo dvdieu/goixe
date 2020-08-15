@@ -1,4 +1,5 @@
 const driverServices = require("../services/DriverServices").DriverServices;
+const BookingServices = require("../services/BookingServices");
 const db = require("../models");
 const Driver = db.Driver;
 const ErrorApp = require("../ErrorCode")
@@ -10,6 +11,7 @@ module.exports = {
             return;
         }
         try {
+
             let driverRequest = new Driver(req.body)
             let driver = await driverServices.createNewDriver(driverRequest).catch(err => {
                 if (err.code === 11000) {
@@ -107,7 +109,7 @@ module.exports = {
     },
     gps: async (req, res) => {
         try {
-            let user = await driverServices.updateDriver(req.auth_info.data._id, req.body);
+            let user = await driverServices.updateGPS(req.auth_info.data._id,req.body.long,req.body.lat,req.body.direction,req.body.velocity,req.body.radius);
             if (user) {
                 res.send({
                     "status": "OK",
@@ -170,15 +172,15 @@ module.exports = {
                 });
             } else {
                 let driver = await driverServices.get(req.auth_info.data._id);
-                if(driver==null){
+                if (driver == null) {
                     res.send({
                         "status": "ERROR",
-                        "message":"Driver Not Exists"
+                        "message": "Driver Not Exists"
                     });
                     return;
                 }
-                if(driver){
-                    if(driver.status==="oncatch"){
+                if (driver) {
+                    if (driver.status === "oncatch") {
                         throw Error(ErrorApp.YOU_HAVE_NOT_COMPLETED_THE_PREVIOUS_TRIP);
                     }
                 }
@@ -190,25 +192,25 @@ module.exports = {
             });
         }
     },
-    async catchTrip(req, res) {
+    async inCharge(req, res) {
         try {
-            let user = await driverServices.updateDriver(req.auth_info.data._id, req.body);
-            if (user) {
+            let trip = await BookingServices.inCharge(req.auth_info.data._id);
+            if (trip) {
                 res.send({
                     "status": "OK",
                     "message": "successfull",
-                    "payload": user
+                    "payload": trip
                 });
             } else {
                 res.send({
                     "status": "ERROR",
-                    "message": "Login Error"
+                    "message": ErrorApp.YOU_NOT_OWNER_TRIP
                 });
             }
         } catch (e) {
             res.send({
                 "status": "ERROR",
-                "message": "Login Error"
+                "message": "Error"
             });
         }
     }

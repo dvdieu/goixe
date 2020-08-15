@@ -84,5 +84,18 @@ module.exports = {
             throw e;
         }
         return -1;
+    },
+    async inCharge(driverId) {
+        try {
+            let driver =   await driverServices.DriverServices.get(driverId);
+            if(driver){
+                if(driver.in_trip_id!==null && driver.in_trip_id!==""){
+                    return await tripServices.getById(driver.in_trip_id);
+                }
+            }
+            return null;
+        } catch (e) {
+           throw e;
+        }
     }
 };

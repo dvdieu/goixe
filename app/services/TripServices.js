@@ -78,4 +78,14 @@ module.exports = {
             throw e;
         }
     },
+    async listTrip(status,page,size){
+        page = page <0 ? 0 : page;
+        try {
+            if(status===null || status.length===0)
+                return Trip.find({}).limit(parseInt(size)).skip(parseInt(size*page)).sort({"createdAt":-1});
+            return Trip.find({"status":{"$in":status}}).limit(parseInt(size)).skip(parseInt(size*page)).sort({"createdAt":-1});
+        } catch (e) {
+            throw e;
+        }
+    }
 }

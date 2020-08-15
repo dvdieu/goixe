@@ -1,4 +1,5 @@
 const driverServices = require("../services/DriverServices").DriverServices;
+const tripServices = require("../services/TripServices");
 module.exports = {
     list_driver_on_catch: async (req, res)=>{
         try {
@@ -95,6 +96,33 @@ module.exports = {
                 payload:new Array()
             });
         }
-    }
+    },
 
+    list_trips: async (req, res) => {
+        try {
+            let page = req.params.page;
+            let size=  req.params.size;
+            let status = req.body.status;
+            let listTrip = await tripServices.listTrip(status,page,size);
+            if (listTrip) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": listTrip
+                });
+            } else {
+                res.send({
+                    "status": "ERROR",
+                    "message": "",
+                    payload:new Array()
+                });
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": "",
+                payload:new Array()
+            });
+        }
+    }
 }
