@@ -1,12 +1,9 @@
-const RedisWrapper = require('./RedisWrapper');
+const RedisWrapper = require('../app/redis/RedisWrapper');
 
-const workerTrip = require("./WorkerTrip")
+const workerTrip = require("./Customer_WorkerPush")
 class WorkerProcessEvent {
     constructor() {
         RedisWrapper.sub.subscribe("new-trip");
-    }
-    static sendNotify(message) {
-        global.io.of('drivers').to("drivers_online").emit("catchTrip", message);
     }
     registerSubscribeEventApplication() {
         console.log("registerSubscribeEventApplication");
