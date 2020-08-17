@@ -103,7 +103,9 @@ module.exports = {
             let page = req.params.page;
             let size=  req.params.size;
             let status = req.body.status;
-            let listTrip = await tripServices.listTrip(status,page,size);
+            let dateFrom= req.body.from;
+            let dateTo = req.body.to;
+            let listTrip = await tripServices.listTrip(status,dateFrom,dateTo,page,size);
             if (listTrip) {
                 res.send({
                     "status": "OK",
