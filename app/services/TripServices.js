@@ -1,6 +1,6 @@
 const db = require("../models");
-const publishEvent = require("../redis/pub");
 const Trip = db.Trip;
+const publishEvent = require("../redis/pub");
 module.exports = {
     async createNewTrip(payload) {
         try {
@@ -57,7 +57,7 @@ module.exports = {
             return Trip.findOneAndUpdate({
                 "_id": tripId,
                 "driverId_for_capture": driverId,
-                "status": {"$in": ["gocustomer", "initial"]}
+                "status": {"$in": ["gocustomer", "initial","starttrip"]}
             }, {"status": "starttrip", "driverId_in_trip": driverId}, {
                 new: true
             });

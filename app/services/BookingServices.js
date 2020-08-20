@@ -1,5 +1,5 @@
 const redis = require("../redis/RedisWrapper").crud;
-const WorkerTrip = require("../redis/WorkerTrip")
+const WorkerTrip = require("../../notification/Customer_WorkerPush")
 const driverServices = require("./DriverServices");
 const tripServices = require("./TripServices");
 const ERRORAPPLICATION = require("../ErrorCode")
@@ -12,6 +12,10 @@ module.exports = {
                 throw new Error(ERRORAPPLICATION.THE_TRIP_HAS_BEEN_ASSIGNED_TO_ANOTHER_ASSET)
             }
             if (currentBooking === driverId) {
+                let driver = await driverServices.DriverServices.get(driverId);
+                let trip = await tripServices.catchTrip(tripId, driverId);
+                let payload = {"driver": driver, "trip": trip};
+                await WorkerTrip.jobHasBeenReceived(trip.customer_id,payload);
                 return tripServices.getById(tripId); //Đã Nhận
             }
             if (redis.setnx(bookingKey, driverId)) {
@@ -19,13 +23,12 @@ module.exports = {
                 if (driver) {
                     let trip = await tripServices.catchTrip(tripId, driverId);
                     let payload = {"driver": driver, "trip": trip};
-                    await WorkerTrip.jobHasBeenReceived(payload);
+                    await WorkerTrip.jobHasBeenReceived(trip.customer_id,payload);
                     return trip;
                 } else {
                     redis.del(bookingKey);
                     throw new Error(ERRORAPPLICATION.YOU_HAVE_NOT_COMPLETED_THE_PREVIOUS_TRIP)
                 }
-
             } else {
                 throw new Error(ERRORAPPLICATION.THE_TRIP_HAS_BEEN_ASSIGNED_TO_ANOTHER_ASSET)
             }
@@ -36,7 +39,6 @@ module.exports = {
     async cancelTrip(driverId, tripId) {
         try {
             let trip = await tripServices.cancelTrip(tripId, driverId);
-
             if (trip) {
                 return trip;
             } else {
@@ -51,9 +53,12 @@ module.exports = {
         try {
             let driver = await driverServices.DriverServices.get(driverId);
             let trip = await tripServices.goToCustomer(tripId, driverId);
-            let payload = {"driver": driver, "trip": trip};
-            await WorkerTrip.driverGoToCustomer(payload);
-            return trip;
+            if(driver && trip) {
+                let payload = {"driver": driver, "trip": trip};
+                await WorkerTrip.driverGoToCustomer(trip.customer_id, payload);
+                return trip;
+            }
+            throw Error(ERRORAPPLICATION.YOU_NOT_OWNER_TRIP);
         } catch (e) {
             console.log(e);
             throw e;
@@ -65,7 +70,7 @@ module.exports = {
             let driver = await driverServices.DriverServices.get(driverId);
             let trip = await tripServices.startTrip(tripID, driverId);
             let payload = {"driver": driver, "trip": trip};
-            await WorkerTrip.startTrip(payload);
+            await WorkerTrip.startTrip(trip.customer_id,payload);
             return trip;
         } catch (e) {
             console.log(e);
@@ -77,13 +82,14 @@ module.exports = {
         try {
             let trip = await tripServices.finishTrip(tripID, driverId)
             let driver = await driverServices.DriverServices.finishTrip(tripID, driverId)
-            await WorkerTrip.finishTrip(trip);
-            return trip;
+            if(trip && driver) {
+                await WorkerTrip.finishTrip(trip.customer_id, trip);
+                return trip;
+            }
+            throw Error(ERRORAPPLICATION.THE_TRIP_COMPLETED);
         } catch (e) {
-            console.log(e);
             throw e;
         }
-        return -1;
     },
     async inCharge(driverId) {
         try {

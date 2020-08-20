@@ -6,4 +6,5 @@ db.mongoose = mongoose;
 db.url = dbConfig.url;
 db.Trip = require("./Trip.model.js")(mongoose);
 db.Driver = require("./Driver.model.js")(mongoose);
+db.Customer = require("./Customer.model.js")(mongoose);
 module.exports = db;

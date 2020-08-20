@@ -1,6 +1,7 @@
 const db = require("../models");
 const Driver = db.Driver;
 const Auth = require("../helps/jwt.helper")
+const ROUTERCONST = require("../RouterConst");
 const redis = require("../redis/RedisWrapper").crud;
 class DriverServices {
     constructor() {
@@ -50,7 +51,7 @@ class DriverServices {
         if (driver == null) {
             return null;
         }
-        return Auth.generateToken(driver);
+        return Auth.generateToken(driver,ROUTERCONST.DRIVERS.token_type);
     }
 
     static async updateGPS(driverID,long,lat,direction,velocity,radius){
@@ -75,7 +76,7 @@ class DriverServices {
         return Driver.create(driver);
     }
     static async updateOnCatch(driverId,tripId){
-        return Driver.findOneAndUpdate({"_id":driverId,"status":{"$in":["on"]}},{"status":"oncatch","in_trip_id":tripId},{new: true});
+        return Driver.findOneAndUpdate({"_id":driverId,"status":{"$in":["on","off"]}},{"status":"oncatch","in_trip_id":tripId},{new: true});
     }
     static async finishTrip(tripID, driverId){
         return Driver.findOneAndUpdate({"_id":driverId,"status":{"$in":["oncatch"]}},{"status":"on","in_trip_id":""},{new: true});

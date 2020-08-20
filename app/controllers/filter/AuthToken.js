@@ -5,7 +5,7 @@ let isAuth = async (req, res, next) => {
         // Nếu tồn tại token
         try {
             // Thực hiện giải mã token xem có hợp lệ hay không?
-            const decoded = await jwtHelper.verifyToken(tokenFromClient, jwtHelper.secretSignature).catch(error=>{
+            const decoded = await jwtHelper.verifyToken(tokenFromClient, jwtHelper.secretSignature,req.baseUrl).catch(error=>{
                 console.log(error)
             });
             // Nếu token hợp lệ, lưu thông tin giải mã được vào đối tượng req, dùng cho các xử lý ở phía sau.

@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 require('dotenv').config()
 const app = express();
-
+const ROUTERCONST = require("./app/RouterConst")
 
 app.use(cors());
 
@@ -32,10 +32,11 @@ app.get("/", (req, res) => {
     res.json({message: "Welcome to application. 0964222806"});
 });
 
-app.use('/trips', require('./app/routes/Trip.routes'));
-app.use('/drivers', require('./app/routes/Driver.routes'));
-app.use('/booking', require('./app/routes/Booking.routes'));
+app.use(ROUTERCONST.TRIPS.base_url, require('./app/routes/Trip.routes'));
+app.use(ROUTERCONST.DRIVERS.base_url, require('./app/routes/Driver.routes'));
+app.use(ROUTERCONST.BOOKING.base_url, require('./app/routes/Booking.routes'));
 app.use('/operations', require('./app/routes/Operation.routes'));
+app.use(ROUTERCONST.CUSTOMERS.base_url, require('./app/routes/Customer.routes'));
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {
@@ -69,7 +70,7 @@ socketIO.on('connection', (socket) => {
 });
 global.io = socketIO;
 const socketApplication = require("./app/config/socket")(socketIO);
-const wokerProcessEvent= require("./app/redis/WokerManager");
+const wokerProcessEvent= require("./notification/Driver_WokerProcessPush");
 new wokerProcessEvent.WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
 
 

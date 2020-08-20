@@ -1,4 +1,7 @@
 const TripServices = require("../services/TripServices");
+const CustomerServices = require("../services/CustomerServices");
+const db = require("../models");
+const Trips = db.Trip;
 module.exports = {
     insertTrip: async (req, res) => {
 
@@ -18,7 +21,15 @@ module.exports = {
             return;
         }
         try {
-            let tripInsert = await TripServices.createNewTrip(req.body);
+            let customer = await CustomerServices.get(req.auth_info.data._id);
+            if(!customer){
+                throw new Error("Customer Not Exists");
+            }
+            let tripModel = new Trips(req.body);
+            tripModel.customer_name = customer.name;
+            tripModel.customer_id = customer._id.toString();
+            tripModel.mobile = customer.mobile;
+            let tripInsert = await TripServices.createNewTrip(tripModel);
             res.send({
                 "status": "OK",
                 "message": "successfull",
@@ -28,7 +39,7 @@ module.exports = {
             console.log(e);
             res.send({
                 "status": "ERROR",
-                "message": "ERROR"
+                "message": e.message
             });
         }
     },
