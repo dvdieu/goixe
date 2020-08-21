@@ -1,6 +1,6 @@
 const RedisWrapper = require("../redis/RedisWrapper");
 module.exports={
-    dataBaseNameCustomerOnline(){
+    dataBaseNameAgentsOnline(){
         return "_CUSTOMERS_ONLINE"
     },
     dataBaseNameDriverOnline(){

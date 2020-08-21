@@ -1,6 +1,6 @@
 const RedisWrapper = require('../app/redis/RedisWrapper');
 
-const workerTrip = require("./Customer_WorkerPush")
+const workerTrip = require("./Agents_WorkerPush")
 class WorkerProcessEvent {
     constructor() {
         RedisWrapper.sub.subscribe("new-trip");

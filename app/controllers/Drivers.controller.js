@@ -212,11 +212,19 @@ module.exports = {
             });
         }
     },
+<<<<<<< HEAD
     goCustomer: async (req, res) => {
         try {
             let tripID = req.params.tripId;
             let driverId = req.auth_info.data._id;
             let trip = await BookingServices.goToCustomers(driverId, tripID);
+=======
+    goAgents: async (req, res) => {
+        try {
+            let tripID = req.params.tripId;
+            let driverId = req.auth_info.data._id;
+            let trip = await BookingServices.goToAgentss(driverId, tripID);
+>>>>>>> update
             res.send({
                 "status": "OK",
                 "message": "successfull",

@@ -69,7 +69,15 @@ socketIO.on('connection', (socket) => {
 global.io = socketIO;
 const socketApplication = require("./app/config/socket")(socketIO);
 const wokerProcessEvent= require("./notification/Driver_WokerProcessPush");
+const {agenda,setup} = require("./app/helps/Scheduler");
 new wokerProcessEvent.WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
 
 
 
+/**
+ start scheduler job
+ */
+(async function() {
+    await setup();
+    await agenda.start();
+})();

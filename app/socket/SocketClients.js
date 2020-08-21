@@ -10,12 +10,16 @@ let registerEvent = async (io, path) => {
     nsp.on('connection', async function (socket) {
         try {
             if(socket.contextAuthenToken.data.type===ROUTERCONST.AGENTS.token_type) {
+<<<<<<< HEAD
                 await SocketDataBase.setSocket(SocketDataBase.dataBaseNameCustomerOnline(), socket.contextAuthenToken.data._id, socket.id);
+=======
+                await SocketDataBase.setSocket(SocketDataBase.dataBaseNameAgentsOnline(), socket.contextAuthenToken.data._id, socket.id);
+>>>>>>> update
                 console.log('someone connected');
                 let message = JSON.stringify(socket.contextAuthenToken.data);
                 nsp.emit('pong', message);
                 socket.on("disconnect", async function (reason) {
-                    await SocketDataBase.delSocket(SocketDataBase.dataBaseNameCustomerOnline(), socket.contextAuthenToken.data._id);
+                    await SocketDataBase.delSocket(SocketDataBase.dataBaseNameAgentsOnline(), socket.contextAuthenToken.data._id);
                     console.log(reason);
                 })
             }

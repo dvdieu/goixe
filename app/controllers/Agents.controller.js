@@ -4,6 +4,10 @@ const Trips = db.Trips;
 const agentServices = require("../services/AgentsServices")
 const ErrorApp = require("../ErrorCode")
 const TripServices = require("../services/TripServices");
+<<<<<<< HEAD
+=======
+const {addJobSchedule} = require("../helps/Scheduler");
+>>>>>>> update
 module.exports = {
     register: async (req, res) => {
         // Validate request
@@ -86,6 +90,12 @@ module.exports = {
                 "message": "Login Error"
             });
         }
+<<<<<<< HEAD
+=======
+        finally {
+
+        }
+>>>>>>> update
     },
     insertTrip: async (req, res) => {
         /**
@@ -106,7 +116,11 @@ module.exports = {
         try {
             let agent = await agentServices.get(req.auth_info.data._id);
             if (!agent) {
+<<<<<<< HEAD
                 throw new Error("Customer Not Exists");
+=======
+                throw new Error("Agents Not Exists");
+>>>>>>> update
             }
             let tripModel = new Trips(req.body);
             tripModel.agent_id = agent._id.toString();
@@ -173,5 +187,36 @@ module.exports = {
                 "payload": tripOfDriver
             });
         }
+<<<<<<< HEAD
+=======
+    },
+    async insertTripSchedule(req, res) {
+        if (!req.body) {
+            res.status(400).send({message: "Content can not be empty!"});
+            return;
+        }
+        try {
+            let agent = await agentServices.get(req.auth_info.data._id);
+            if (!agent) {
+                throw new Error("Agents Not Exists");
+            }
+            let tripModel = new Trips(req.body);
+            tripModel.agent_id = agent._id.toString();
+            tripModel.trip_type="schedule";
+            tripModel.mobile = agent.mobile;
+            let tripInsert = await TripServices.scheduleTrip(tripModel);
+            res.send({
+                "status": "OK",
+                "message": "successfull",
+                "payload": tripInsert
+            });
+        } catch (e) {
+            console.log(e);
+            res.send({
+                "status": "ERROR",
+                "message": e.message
+            });
+        }
+>>>>>>> update
     }
 }

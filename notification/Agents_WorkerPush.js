@@ -12,14 +12,18 @@ module.exports = {
             throw e;
         }
     },
-    async driverGoToCustomer(customerId, data) {
+    async driverGoToAgents(customerId, data) {
         try {
             let message = {"status": "OK", "message": "Tài xế đang tới chỗ bạn", "payload": data};
 
-            console.log("goCustomer" + JSON.stringify(message));
-            let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameCustomerOnline(), customerId)
+            console.log("goAgents" + JSON.stringify(message));
+            let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameAgentsOnline(), customerId)
             if (socketID) {
+<<<<<<< HEAD:notification/Customer_WorkerPush.js
                 await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("goCustomer", JSON.stringify(message));
+=======
+                await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("goAgents", JSON.stringify(message));
+>>>>>>> update:notification/Agents_WorkerPush.js
             }
         } catch (e) {
             console.log(e);
@@ -34,7 +38,7 @@ module.exports = {
                 "payload": data
             };
             console.log("startTrip" + JSON.stringify(message));
-            let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameCustomerOnline(), customerId)
+            let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameAgentsOnline(), customerId)
             if (socketID) {
                 global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("startTrip", JSON.stringify(message));
             }
@@ -51,7 +55,7 @@ module.exports = {
                 "payload": data
             };
             console.log("finishTrip" + JSON.stringify(message));
-            let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameCustomerOnline(), customerId)
+            let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameAgentsOnline(), customerId)
             if (socketID) {
                 await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("finishTrip", JSON.stringify(message));
             }
@@ -64,7 +68,7 @@ module.exports = {
         try {
             let message = {"status": "OK", "message": "Tài xế đã nhận cuốc xe của bạn", "payload": data};
             console.log("catchTrip" + JSON.stringify(message));
-            let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameCustomerOnline(), customerId)
+            let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameAgentsOnline(), customerId)
             if (socketID) {
                 await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("catchTrip", JSON.stringify(message));
             }

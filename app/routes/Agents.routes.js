@@ -6,4 +6,8 @@ router.post("/login",agent.login);
 router.use(AuthMiddleWare.isAuth);
 router.get("/me",agent.me);
 router.post("/trips/create",agent.insertTrip)
+<<<<<<< HEAD
+=======
+router.post("/trips/create/schedule",agent.insertTripSchedule);
+>>>>>>> update
 module.exports=router;
