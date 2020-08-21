@@ -9,7 +9,7 @@ let registerEvent = async (io, path) => {
     nsp.use(authSocket.isAuth);
     nsp.on('connection', async function (socket) {
         try {
-            if(socket.contextAuthenToken.data.type===ROUTERCONST.CUSTOMERS.token_type) {
+            if(socket.contextAuthenToken.data.type===ROUTERCONST.AGENTS.token_type) {
                 await SocketDataBase.setSocket(SocketDataBase.dataBaseNameCustomerOnline(), socket.contextAuthenToken.data._id, socket.id);
                 console.log('someone connected');
                 let message = JSON.stringify(socket.contextAuthenToken.data);

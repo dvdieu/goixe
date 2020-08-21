@@ -1,20 +1,12 @@
 var ROUTERCONST = {
-   "CUSTOMERS":{
-       "base_url":"/customers",
-       "token_type":"customers"
+   "AGENTS":{
+       "base_url":"/agents",
+       "token_type":"agents"
    },
    "DRIVERS":{
        "base_url":"/drivers",
        "token_type":"drivers"
    },
-   "TRIPS":{
-       "base_url":"/trips",
-       "token_type":"customers"
-   },
-    "BOOKING":{
-        "base_url":"/booking",
-        "token_type":"drivers"
-    }
 }
 
 module.exports = ROUTERCONST;

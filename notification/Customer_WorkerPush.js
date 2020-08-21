@@ -19,7 +19,7 @@ module.exports = {
             console.log("goCustomer" + JSON.stringify(message));
             let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameCustomerOnline(), customerId)
             if (socketID) {
-                global.io.of(ROUTERCONST.CUSTOMERS.base_url).to(socketID).emit("goCustomer", JSON.stringify(message));
+                await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("goCustomer", JSON.stringify(message));
             }
         } catch (e) {
             console.log(e);
@@ -36,7 +36,7 @@ module.exports = {
             console.log("startTrip" + JSON.stringify(message));
             let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameCustomerOnline(), customerId)
             if (socketID) {
-                global.io.of(ROUTERCONST.CUSTOMERS.base_url).to(socketID).emit("startTrip", JSON.stringify(message));
+                global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("startTrip", JSON.stringify(message));
             }
         } catch (e) {
             console.log(e);
@@ -53,7 +53,7 @@ module.exports = {
             console.log("finishTrip" + JSON.stringify(message));
             let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameCustomerOnline(), customerId)
             if (socketID) {
-                global.io.of(ROUTERCONST.CUSTOMERS.base_url).to(socketID).emit("finishTrip", JSON.stringify(message));
+                await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("finishTrip", JSON.stringify(message));
             }
         } catch (e) {
             console.log(e);
@@ -66,7 +66,7 @@ module.exports = {
             console.log("catchTrip" + JSON.stringify(message));
             let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameCustomerOnline(), customerId)
             if (socketID) {
-                global.io.of(ROUTERCONST.CUSTOMERS.base_url).to(socketID).emit("catchTrip", JSON.stringify(message));
+                await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("catchTrip", JSON.stringify(message));
             }
             // global.io.of("/clients").emit("catchTrip",JSON.stringify(message));
         } catch (e) {
@@ -80,7 +80,7 @@ module.exports = {
             let tripId = data.id;
             let lat = data.from_lat;
             let long = data.from_lng;
-            let listDriver = await driverServices.DriverServices.near(long, lat, 10);//10
+            let listDriver = await driverServices.near(long, lat, 10);//10
             if (listDriver === null || listDriver === undefined || listDriver.length === 0) {
                 //global.io.of("client").emit("");
                 //Tất cả tài xế đang bận
@@ -89,7 +89,7 @@ module.exports = {
                     "message": "Tất cả tài xế đang bận",
                     "payload": {},
                 }
-                global.io.of("/managers").emit("catchTrip", JSON.stringify(payload));
+                await global.io.of("/managers").emit("catchTrip", JSON.stringify(payload));
                 return;
             }
             let listDriverNear = listDriver.map(function (item) {
@@ -109,8 +109,7 @@ module.exports = {
                 };
                 listDriverOnline.forEach((v, k) => {
                     if (v) {
-                        let status = global.io.of(ROUTERCONST.DRIVERS.base_url).to(v).emit("catchTrip", JSON.stringify(payload));
-                        console.log(status)
+                        global.io.of(ROUTERCONST.DRIVERS.base_url).to(v).emit("catchTrip", JSON.stringify(payload));
                     }
                 });
             } else {
@@ -119,7 +118,7 @@ module.exports = {
                     "message": "DRIVER OUT RANGE OR NOT ONLINE"
                 }
                 console.log("catchTrip" + data);
-                global.io.of("/clients").emit("catchTrip", JSON.stringify(data));
+                await global.io.of("/clients").emit("catchTrip", JSON.stringify(data));
             }
         } catch (e) {
             console.log(e);

@@ -11,7 +11,7 @@ module.exports = mongoose => {
             from_lat: {type:Number,default:0.0},
             to_lng: {type:Number,default:0.0},
             to_lat: {type:Number,default:0.0},
-            customer_id:{type:String,default:""},
+            agent_id:{type:String,default:""},
             status:{type:String,default:"draft",enum:["draft","initial","cancel","gocustomer","starttrip","finish"]},
             mobile: {type:String,default:""},
             max_driver_for_capture:{type:Number,default:0.0},

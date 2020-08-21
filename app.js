@@ -32,11 +32,9 @@ app.get("/", (req, res) => {
     res.json({message: "Welcome to application. 0964222806"});
 });
 
-app.use(ROUTERCONST.TRIPS.base_url, require('./app/routes/Trip.routes'));
 app.use(ROUTERCONST.DRIVERS.base_url, require('./app/routes/Driver.routes'));
-app.use(ROUTERCONST.BOOKING.base_url, require('./app/routes/Booking.routes'));
+app.use(ROUTERCONST.AGENTS.base_url, require('./app/routes/Agents.routes'));
 app.use('/operations', require('./app/routes/Operation.routes'));
-app.use(ROUTERCONST.CUSTOMERS.base_url, require('./app/routes/Customer.routes'));
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, () => {

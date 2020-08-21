@@ -1,4 +1,4 @@
-const driverServices = require("../services/DriverServices").DriverServices;
+const driverServices = require("../services/DriverServices");
 const tripServices = require("../services/TripServices");
 module.exports = {
     list_driver_on_catch: async (req, res)=>{
@@ -124,6 +124,29 @@ module.exports = {
                 "status": "ERROR",
                 "message": "",
                 payload:new Array()
+            });
+        }
+    },
+    async findTrip(req, res) {
+        try {
+            let tripID = req.params.tripId;
+            let trip = await tripServices.getById(tripID);
+            if (trip) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": trip
+                });
+            } else {
+                res.send({
+                    "status": "ERROR",
+                    "message": "",
+                });
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": ""
             });
         }
     }

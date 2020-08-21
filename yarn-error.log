@@ -1,0 +1,60 @@
+Arguments: 
+  /home/dieudv/.nvm/versions/node/v12.18.3/bin/node /usr/share/yarn/bin/yarn.js add mongoose
+
+PATH: 
+  /home/dieudv/.nvm/versions/node/v12.18.3/bin:/home/dieudv/docker/node_modules/.bin:/home/dieudv/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/dart/bin
+
+Yarn version: 
+  1.22.4
+
+Node version: 
+  12.18.3
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: EACCES: permission denied, mkdir '/home/dieudv/docker/nodejs/node_modules/mquery/node_modules/bluebird'
+
+npm manifest: 
+  {
+    "name": "feedback-receive-applications",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "amqplib": "^0.6.0",
+      "body-parser": "^1.19.0",
+      "cors": "^2.8.5",
+      "crypto-js": "^4.0.0",
+      "dotenv": "^8.2.0",
+      "express": "^4.17.1",
+      "ioredis": "^4.17.3",
+      "jsonwebtoken": "^8.5.1",
+      "mongoose": "^5.9.25",
+      "redis": "^3.0.2",
+      "socket.io": "^2.3.0",
+      "socket.io-redis": "^5.3.0"
+    },
+    "devDependencies": {},
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/dvdieu/soket.git"
+    },
+    "keywords": [],
+    "bugs": {
+      "url": "https://github.com/dvdieu/soket/issues"
+    },
+    "homepage": "https://github.com/dvdieu/soket#readme",
+    "description": ""
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

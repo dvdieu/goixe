@@ -1,8 +1,9 @@
-const driverServices = require("../services/DriverServices").DriverServices;
+const driverServices = require("../services/DriverServices");
 const BookingServices = require("../services/BookingServices");
 const db = require("../models");
 const Driver = db.Driver;
 const ErrorApp = require("../ErrorCode")
+const ROUTERCONST = require("../RouterConst");
 module.exports = {
     register: async (req, res) => {
         // Validate request
@@ -11,26 +12,18 @@ module.exports = {
             return;
         }
         try {
-
             let driverRequest = new Driver(req.body)
             let driver = await driverServices.createNewDriver(driverRequest).catch(err => {
                 if (err.code === 11000) {
-                    res.status(500).send({
-                        message: "User exists"
-                    });
-                    return;
+                    throw new Error(ErrorApp.DRIVER_EXISTS);
                 }
-                res.status(500).send({
-                    message:
-                        err.message || "Some error occurred while creating the FeedBack."
-                });
             });
             res.send({
                 "status": "OK",
                 "message": "successfull",
                 "payload": driver
             });
-        }catch (e){
+        } catch (e) {
             res.send({
                 "status": "ERROR",
                 "message": e.message
@@ -109,7 +102,12 @@ module.exports = {
     },
     gps: async (req, res) => {
         try {
-            let user = await driverServices.updateGPS(req.auth_info.data._id,req.body.long,req.body.lat,req.body.direction,req.body.velocity,req.body.radius);
+            let user = await driverServices.updateGPS(req.auth_info.data._id, req.body.long, req.body.lat, req.body.direction, req.body.velocity, req.body.radius);
+            global.io.of(ROUTERCONST.AGENTS.base_url).emit("gps",{
+                "status": "OK",
+                "message": "successfull",
+                "payload": user
+            });
             if (user) {
                 res.send({
                     "status": "OK",
@@ -140,15 +138,15 @@ module.exports = {
                 });
             } else {
                 let driver = await driverServices.get(req.auth_info.data._id);
-                if(driver==null){
+                if (driver == null) {
                     res.send({
                         "status": "ERROR",
-                        "message":"Driver Not Exists"
+                        "message": "Driver Not Exists"
                     });
                     return;
                 }
-                if(driver){
-                    if(driver.status==="oncatch"){
+                if (driver) {
+                    if (driver.status === "oncatch") {
                         throw Error(ErrorApp.YOU_HAVE_NOT_COMPLETED_THE_PREVIOUS_TRIP);
                     }
                 }
@@ -211,6 +209,98 @@ module.exports = {
             res.send({
                 "status": "ERROR",
                 "message": "Error"
+            });
+        }
+    },
+    goCustomer: async (req, res) => {
+        try {
+            let tripID = req.params.tripId;
+            let driverId = req.auth_info.data._id;
+            let trip = await BookingServices.goToCustomers(driverId, tripID);
+            res.send({
+                "status": "OK",
+                "message": "successfull",
+                "payload": trip
+            });
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": e.message
+            });
+        }
+    },
+    finishTrip: async (req, res) => {
+        try {
+            let tripID = req.params.tripId;
+            let driverId = req.auth_info.data._id;
+            let status = await BookingServices.finishTrip(driverId, tripID);
+            res.send({
+                "status": "OK",
+                "message": "successfull",
+                "payload": status
+            });
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": e.message
+            });
+        }
+    },
+    cancelTrip: async (req, res) => {
+        try {
+            let driverId = req.auth_info.data._id;
+            let status = await BookingServices.cancelTrip(driverId, req.params.tripId);
+            res.send({
+                "status": "OK",
+                "message": "successfull",
+                "payload": status
+            });
+        } catch (e) {
+            console.log(e);
+            res.send({
+                "status": "ERROR",
+                "message": e.message
+            });
+        }
+    },
+    catchTrip: async (req, res) => {
+        try {
+
+            let driverId = req.auth_info.data._id;
+            let payload = await BookingServices.catchTrip(driverId, req.params.tripId);
+            if (payload) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": payload
+                });
+            } else {
+                res.send({
+                    "status": "ERROR",
+                    "message": "Login Error",
+                });
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": e.message
+            });
+        }
+    },
+    async go(req, res) {
+        try {
+            let tripID = req.params.tripId;
+            let driverId = req.auth_info.data._id;
+            let status = await BookingServices.go(driverId, tripID);
+            res.send({
+                "status": "OK",
+                "message": "successfull",
+                "payload": status
+            });
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": e.message
             });
         }
     }
