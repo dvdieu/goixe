@@ -249,7 +249,7 @@ module.exports = {
     cancelTrip: async (req, res) => {
         try {
             let driverId = req.auth_info.data._id;
-            let status = await BookingServices.cancelTrip(driverId, req.params.tripId);
+            let status = await BookingServices.driverCancelTrip(driverId, req.params.tripId);
             res.send({
                 "status": "OK",
                 "message": "successfull",

@@ -1,9 +1,13 @@
 const redis = require("../redis/RedisWrapper").crud;
-const WorkerTrip = require("../../notification/Agents_WorkerPush")
+require("../../notification/AgentsNotification")
 const driverServices = require("./DriverServices");
 const tripServices = require("./TripServices");
 const ERRORAPPLICATION = require("../ErrorCode")
 const mongoose = require("mongoose")
+const {notifyOnStartTrip} = require("../../notification/AgentsNotification");
+const {notifyOnFinishTrip} = require("../../notification/AgentsNotification");
+const {notifyOnDriverGoToCustomer} = require("../../notification/AgentsNotification");
+const {notifyOnDriverCatchTrip} = require("../../notification/AgentsNotification");
 module.exports = {
     async catchTrip(driverId, tripId) {
         const sessionDriver = await mongoose.startSession();
@@ -23,7 +27,7 @@ module.exports = {
                     throw new Error(ERRORAPPLICATION.YOU_CAN_NOT_CATCH_THIS_TRIP)
                 }
                 let payload = {"driver": driver, "trip": trip};
-                await WorkerTrip.jobHasBeenReceived(trip.agent_id, payload);
+                await notifyOnDriverCatchTrip(trip.agent_id, payload);
                 return tripServices.getById(tripId); //Đã Nhận
             }
             if (redis.setnx(bookingKey, driverId)) {
@@ -31,7 +35,7 @@ module.exports = {
                 let trip = await tripServices.catchTrip(tripId, driverId,sessionTrip);
                 if (driver && trip) {
                     let payload = {"driver": driver, "trip": trip};
-                    await WorkerTrip.jobHasBeenReceived(trip.agent_id, payload);
+                    await notifyOnDriverCatchTrip(trip.agent_id, payload);
                     sessionTrip.commitTransaction();
                     sessionDriver.commitTransaction();
                     return trip;
@@ -53,7 +57,7 @@ module.exports = {
             sessionTrip.endSession();
         }
     },
-    async cancelTrip(driverId, tripId) {
+    async driverCancelTrip(driverId, tripId) {
         try {
             let trip = await tripServices.driverCancelTrip(tripId, driverId);
             if (trip) {
@@ -62,7 +66,23 @@ module.exports = {
                 return -1;
             }
         } catch (e) {
-            console.log(e);
+            let bookingKey = "booking:" + tripId;
+            redis.del(bookingKey);
+            throw e;
+        }
+    },
+    async agentCancelTrip(tripId, agentId) {
+        try {
+            let trip = await tripServices.agentCancelTrip(tripId, agentId);
+            await notifyOnDriverCatchTrip(trip.agent_id, payload);
+            if (trip) {
+                return trip;
+            } else {
+                return -1;
+            }
+        } catch (e) {
+            let bookingKey = "booking:" + tripId;
+            redis.del(bookingKey);
             throw e;
         }
     },
@@ -72,7 +92,7 @@ module.exports = {
             let trip = await tripServices.goToAgents(tripId, driverId);
             if (driver && trip) {
                 let payload = {"driver": driver, "trip": trip};
-                await WorkerTrip.driverGoToCustomer(trip.agent_id, payload);
+                await notifyOnDriverGoToCustomer(trip.agent_id, payload);
                 return trip;
             }
             throw Error(ERRORAPPLICATION.YOU_NOT_OWNER_TRIP);
@@ -90,7 +110,7 @@ module.exports = {
             let trip = await tripServices.startTrip(tripID, driverId,sessionTrip);
             let payload = {"driver": driver, "trip": trip};
             if (driver && trip) {
-                await WorkerTrip.startTrip(trip.agent_id, payload);
+                await notifyOnStartTrip(trip.agent_id, payload);
                 sessionDriver.commitTransaction();
                 sessionTrip.commitTransaction();
                 return trip;
@@ -110,7 +130,7 @@ module.exports = {
             let trip = await tripServices.finishTrip(tripID, driverId,sessionTrip)
             let driver = await driverServices.finishTrip(tripID, driverId,sessionDriver)
             if (trip && driver) {
-                await WorkerTrip.finishTrip(trip.agent_id, trip);
+                await notifyOnFinishTrip(trip.agent_id, trip);
                 sessionDriver.commitTransaction();
                 sessionTrip.commitTransaction();
                 return trip;

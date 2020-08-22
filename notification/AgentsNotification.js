@@ -12,7 +12,7 @@ module.exports = {
             throw e;
         }
     },
-    async driverGoToCustomer(customerId, data) {
+    async notifyOnDriverGoToCustomer(customerId, data) {
         try {
             let message = {"status": "OK", "message": "Tài xế đang tới chỗ bạn", "payload": data};
 
@@ -26,7 +26,7 @@ module.exports = {
             throw e;
         }
     },
-    async startTrip(customerId, data) {
+    async notifyOnStartTrip(customerId, data) {
         try {
             let message = {
                 "status": "OK",
@@ -43,7 +43,7 @@ module.exports = {
             throw e;
         }
     },
-    async finishTrip(customerId, data) {
+    async notifyOnFinishTrip(customerId, data) {
         try {
             let message = {
                 "status": "OK",
@@ -60,7 +60,7 @@ module.exports = {
             throw e;
         }
     },
-    async jobHasBeenReceived(customerId, data) {
+    async notifyOnDriverCatchTrip(customerId, data) {
         try {
             let message = {"status": "OK", "message": "Tài xế đã nhận cuốc xe của bạn", "payload": data};
             console.log("catchTrip" + JSON.stringify(message));
@@ -74,7 +74,7 @@ module.exports = {
             throw e;
         }
     },
-    async createJobFoTheDriver(message) {
+    async notifyWhenNewTripCreate(message) {
         try {
             let data = JSON.parse(message);
             let tripId = data.id;
@@ -94,8 +94,7 @@ module.exports = {
             }
             let listDriverNear = listDriver.map(function (item) {
                 return item._id.toString();
-            })
-
+            });
             let listDriverOnline = await RedisWrapper.crud.hmget(SocketDataBase.dataBaseNameDriverOnline(), listDriverNear);
             if (listDriverOnline != null && listDriverOnline.length > 0) {
                 listDriverOnline.forEach(async function (item) {
