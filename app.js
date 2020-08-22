@@ -14,6 +14,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 // mongoose init
 const db = require("./app/models");
+const {AMQPGetConnection} = require("./app/config/amqp/rabbitConnection");
+const {DOMAIN_EVENT} = require("./app/models/event/DOMAIN_EVENT");
+const {AMQPConsumerProcessOnNewTrip} = require("./app/config/amqp/worker/ConsumerProcessNewTrip");
+const {AMQPRegisterConsumer} = require("./app/config/amqp/sub");
+const {AMQPSetUpDomainBroker} = require("./app/config/amqp/pub");
 const {WorkerProcessEvent} = require("./notification/DriversNotification");
 db.mongoose
     .connect(db.url, {
@@ -72,7 +77,7 @@ socketIO.on('connection', (socket) => {
 global.io = socketIO;
 const socketApplication = require("./app/config/socket")(socketIO);
 const {agenda,setup} = require("./app/helps/Scheduler");
-new WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
+// new WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
 
 
 
@@ -84,7 +89,8 @@ new WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
 (async function() {
     await setup();
     await agenda.start();
-    // global.AMQPConnection = await AMQPGetConnection();
-    // await AMQPSetUpDomainBroker(global.AMQPConnection);
-    // await AMQPRegisterConsumer(DOMAIN_EVENT.TRIPS,"new_trip","",AMQPConsumerProcessOnNewTrip);
+    // new WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
+    global.AMQPConnection = await AMQPGetConnection();
+    await AMQPSetUpDomainBroker(global.AMQPConnection);
+    await AMQPRegisterConsumer(DOMAIN_EVENT.TRIPS,"new_trip","",AMQPConsumerProcessOnNewTrip);
 })();

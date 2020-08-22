@@ -18,8 +18,8 @@ module.exports = {
     async createNewTrip(payload) {
         try {
             let newTrip = await Trip.create(new Trip(payload));
-            // AMQPPublish(DOMAIN_EVENT.TRIPS,"",JSON.stringify(newTrip));
-            publishEvent.publish("new-trip", newTrip.toJSON())
+            AMQPPublish(DOMAIN_EVENT.TRIPS,"",JSON.stringify(newTrip));
+            // publishEvent.publish("new-trip", newTrip.toJSON())
             return newTrip;
         } catch (e) {
             throw e
