@@ -55,7 +55,7 @@ module.exports = {
     },
     async cancelTrip(driverId, tripId) {
         try {
-            let trip = await tripServices.cancelTrip(tripId, driverId);
+            let trip = await tripServices.driverCancelTrip(tripId, driverId);
             if (trip) {
                 return trip;
             } else {
@@ -66,13 +66,13 @@ module.exports = {
             throw e;
         }
     },
-    async goToAgentss(driverId, tripId) {
+    async gotoCustomers(driverId, tripId) {
         try {
             let driver = await driverServices.get(driverId);
             let trip = await tripServices.goToAgents(tripId, driverId);
             if (driver && trip) {
                 let payload = {"driver": driver, "trip": trip};
-                await WorkerTrip.driverGoToAgents(trip.agent_id, payload);
+                await WorkerTrip.driverGoToCustomer(trip.agent_id, payload);
                 return trip;
             }
             throw Error(ERRORAPPLICATION.YOU_NOT_OWNER_TRIP);

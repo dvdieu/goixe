@@ -205,5 +205,18 @@ module.exports = {
                 "message": e.message
             });
         }
+    },
+    async cancelTrip() {
+        let tripOfDriver = await TripServices.cancelTrip(req.params.tripId);
+        if (tripOfDriver == null) {
+            res.send({'status': 'ERROR', 'message': 'Trip not exists'})
+            return;
+        } else {
+            res.send({
+                "status": "OK",
+                "message": "Login successfull",
+                "payload": tripOfDriver
+            });
+        }
     }
 }

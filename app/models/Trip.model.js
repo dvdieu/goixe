@@ -24,7 +24,8 @@ module.exports = mongoose => {
             created_date:{type:Date,default:Date.now()},
             driverId_in_trip:{type:String,default:""},
             driverId_for_capture:{type:String,default:""},
-            driverId_for_excluded:{type:Array,default:[]}
+            driverId_for_excluded:{type:Array,default:[]},
+            agent_cancel_id:{type:String,required:true}
         },
         {timestamps: true}
     );

@@ -7,4 +7,5 @@ router.use(AuthMiddleWare.isAuth);
 router.get("/me",agent.me);
 router.post("/trips/create",agent.insertTrip)
 router.post("/trips/create/schedule",agent.insertTripSchedule);
+router.post("/trips/cancel/:tripId",agent.cancelTrip);
 module.exports=router;

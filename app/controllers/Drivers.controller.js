@@ -216,7 +216,7 @@ module.exports = {
         try {
             let tripID = req.params.tripId;
             let driverId = req.auth_info.data._id;
-            let trip = await BookingServices.goToAgentss(driverId, tripID);
+            let trip = await BookingServices.gotoCustomers(driverId, tripID);
             res.send({
                 "status": "OK",
                 "message": "successfull",

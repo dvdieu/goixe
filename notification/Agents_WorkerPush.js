@@ -6,20 +6,20 @@ const SocketDataBase = require("../app/persistence/SocketDataBase");
 module.exports = {
     async jobHasBeenCancel(tripId, driverId) {
         try {
-            let result = await tripServices.cancelTrip(tripId, driverId);
+            let result = await tripServices.driverCancelTrip(tripId, driverId);
         } catch (e) {
             console.log(e);
             throw e;
         }
     },
-    async driverGoToAgents(customerId, data) {
+    async driverGoToCustomer(customerId, data) {
         try {
             let message = {"status": "OK", "message": "Tài xế đang tới chỗ bạn", "payload": data};
 
             console.log("goAgents" + JSON.stringify(message));
             let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameAgentsOnline(), customerId)
             if (socketID) {
-                await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("goAgents", JSON.stringify(message));
+                await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("goCustomer", JSON.stringify(message));
             }
         } catch (e) {
             console.log(e);

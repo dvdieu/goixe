@@ -29,7 +29,7 @@ module.exports = {
             throw e
         }
     },
-    async cancelTrip(tripId, driverId) {
+    async driverCancelTrip(tripId, driverId) {
         try {
             return await Trip.findOneAndUpdate({"_id": tripId, "driverId_for_capture": {"$ne": driverId}},
                 {
@@ -111,6 +111,20 @@ module.exports = {
                     $lte: Math.max(dateTo, dateFrom)
                 }
             }).limit(parseInt(size)).skip(parseInt(size * page)).sort({"createdAt": -1});
+        } catch (e) {
+            throw e;
+        }
+    },
+    async cancelTrip(tripId,cancelId) {
+        try {
+            return Trip.findOneAndUpdate({
+                "_id": tripId,
+                "driverId_in_trip": driverId,
+                "status": {"$in": ["starttrip", "finish"]}
+            }, {"status": "finish", "driverId_in_trip": "", "driverId_for_capture": ""}, {
+                new: true,
+                sessionTrip
+            });
         } catch (e) {
             throw e;
         }
