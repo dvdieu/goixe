@@ -16,11 +16,7 @@ router.get("/in_charge",driverController.inCharge);
 
 router.get("/trips/catch/:tripId",AgentController.catchTrip);
 router.get("/trips/cancel/:tripId",AgentController.cancelTrip);
-<<<<<<< HEAD
-router.get("/trips/go_cusmtomer/:tripId",AgentController.goCustomer);
-=======
 router.get("/trips/go_cusmtomer/:tripId",AgentController.goAgents);
->>>>>>> update
 router.get("/trips/go/:tripId",AgentController.go);
 router.get("/trips/finish/:tripId",AgentController.finishTrip);
 

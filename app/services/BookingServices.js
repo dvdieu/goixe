@@ -1,10 +1,5 @@
 const redis = require("../redis/RedisWrapper").crud;
-<<<<<<< HEAD
-const db = require("../models");
-const WorkerTrip = require("../../notification/Customer_WorkerPush")
-=======
 const WorkerTrip = require("../../notification/Agents_WorkerPush")
->>>>>>> update
 const driverServices = require("./DriverServices");
 const tripServices = require("./TripServices");
 const ERRORAPPLICATION = require("../ErrorCode")
@@ -74,17 +69,10 @@ module.exports = {
     async goToAgentss(driverId, tripId) {
         try {
             let driver = await driverServices.get(driverId);
-<<<<<<< HEAD
-            let trip = await tripServices.goToCustomer(tripId, driverId);
-            if (driver && trip) {
-                let payload = {"driver": driver, "trip": trip};
-                await WorkerTrip.driverGoToCustomer(trip.agent_id, payload);
-=======
             let trip = await tripServices.goToAgents(tripId, driverId);
             if (driver && trip) {
                 let payload = {"driver": driver, "trip": trip};
                 await WorkerTrip.driverGoToAgents(trip.agent_id, payload);
->>>>>>> update
                 return trip;
             }
             throw Error(ERRORAPPLICATION.YOU_NOT_OWNER_TRIP);

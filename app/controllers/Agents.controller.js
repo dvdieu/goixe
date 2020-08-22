@@ -4,10 +4,7 @@ const Trips = db.Trips;
 const agentServices = require("../services/AgentsServices")
 const ErrorApp = require("../ErrorCode")
 const TripServices = require("../services/TripServices");
-<<<<<<< HEAD
-=======
 const {addJobSchedule} = require("../helps/Scheduler");
->>>>>>> update
 module.exports = {
     register: async (req, res) => {
         // Validate request
@@ -90,12 +87,9 @@ module.exports = {
                 "message": "Login Error"
             });
         }
-<<<<<<< HEAD
-=======
         finally {
 
         }
->>>>>>> update
     },
     insertTrip: async (req, res) => {
         /**
@@ -116,11 +110,7 @@ module.exports = {
         try {
             let agent = await agentServices.get(req.auth_info.data._id);
             if (!agent) {
-<<<<<<< HEAD
-                throw new Error("Customer Not Exists");
-=======
                 throw new Error("Agents Not Exists");
->>>>>>> update
             }
             let tripModel = new Trips(req.body);
             tripModel.agent_id = agent._id.toString();
@@ -187,8 +177,6 @@ module.exports = {
                 "payload": tripOfDriver
             });
         }
-<<<<<<< HEAD
-=======
     },
     async insertTripSchedule(req, res) {
         if (!req.body) {
@@ -217,6 +205,5 @@ module.exports = {
                 "message": e.message
             });
         }
->>>>>>> update
     }
 }

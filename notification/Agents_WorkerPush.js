@@ -19,11 +19,7 @@ module.exports = {
             console.log("goAgents" + JSON.stringify(message));
             let socketID = await SocketDataBase.getSocket(SocketDataBase.dataBaseNameAgentsOnline(), customerId)
             if (socketID) {
-<<<<<<< HEAD:notification/Customer_WorkerPush.js
-                await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("goCustomer", JSON.stringify(message));
-=======
                 await global.io.of(ROUTERCONST.AGENTS.base_url).to(socketID).emit("goAgents", JSON.stringify(message));
->>>>>>> update:notification/Agents_WorkerPush.js
             }
         } catch (e) {
             console.log(e);
