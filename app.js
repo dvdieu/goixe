@@ -14,12 +14,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 // mongoose init
 const db = require("./app/models");
-const {AMQPGetConnection} = require("./app/config/amqp/rabbitConnection");
-const {DOMAIN_EVENT} = require("./app/models/event/DOMAIN_EVENT");
-const {AMQPConsumerProcessOnNewTrip} = require("./app/config/amqp/worker/ConsumerProcessNewTrip");
-const {AMQPRegisterConsumer} = require("./app/config/amqp/sub");
-const {AMQPSetUpDomainBroker} = require("./app/config/amqp/pub");
-const {WorkerProcessEvent} = require("./notification/DriversNotification");
 db.mongoose
     .connect(db.url, {
         useNewUrlParser: true,
@@ -43,17 +37,15 @@ app.use(ROUTERCONST.AGENTS.base_url, require('./app/routes/Agents.routes'));
 app.use('/operations', require('./app/routes/Operation.routes'));
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
-
-
 const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
-
 });
 
 /**
  * SOCKETIO
  */
 
+const redis = require('redis');
 // });
 
 
@@ -76,21 +68,16 @@ socketIO.on('connection', (socket) => {
 });
 global.io = socketIO;
 const socketApplication = require("./app/config/socket")(socketIO);
+const wokerProcessEvent= require("./notification/Driver_WokerProcessPush");
 const {agenda,setup} = require("./app/helps/Scheduler");
-// new WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
+new wokerProcessEvent.WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
 
 
 
 /**
  start scheduler job
  */
-
-
 (async function() {
     await setup();
     await agenda.start();
-    // new WorkerProcessEvent(socketIO).registerSubscribeEventApplication();
-    global.AMQPConnection = await AMQPGetConnection();
-    await AMQPSetUpDomainBroker(global.AMQPConnection);
-    await AMQPRegisterConsumer(DOMAIN_EVENT.TRIPS,"new_trip","",AMQPConsumerProcessOnNewTrip);
 })();

@@ -4,7 +4,6 @@ const Trips = db.Trips;
 const agentServices = require("../services/AgentsServices")
 const ErrorApp = require("../ErrorCode")
 const TripServices = require("../services/TripServices");
-const {agentCancelTrip} = require("../services/BookingServices");
 const {addJobSchedule} = require("../helps/Scheduler");
 module.exports = {
     register: async (req, res) => {
@@ -207,8 +206,8 @@ module.exports = {
             });
         }
     },
-    async cancelTrip(req,res) {
-        let tripOfDriver = await agentCancelTrip(req.params.tripId,req.auth_info.data._id);
+    async cancelTrip() {
+        let tripOfDriver = await TripServices.cancelTrip(req.params.tripId);
         if (tripOfDriver == null) {
             res.send({'status': 'ERROR', 'message': 'Trip not exists'})
             return;

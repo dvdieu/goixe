@@ -2,8 +2,6 @@ const db = require("../models");
 const Trip = db.Trips;
 const publishEvent = require("../redis/pub");
 const SCHEDULE_JOB_NAME = require("../helps/SheduleJobName");
-const {DOMAIN_EVENT} = require("../models/event/DOMAIN_EVENT");
-const {AMQPPublish} = require("../config/amqp/pub");
 const {addJobSchedule} = require("../helps/Scheduler");
 module.exports = {
     async scheduleTrip(payload) {
@@ -18,8 +16,7 @@ module.exports = {
     async createNewTrip(payload) {
         try {
             let newTrip = await Trip.create(new Trip(payload));
-            AMQPPublish(DOMAIN_EVENT.TRIPS,"",JSON.stringify(newTrip));
-            // publishEvent.publish("new-trip", newTrip.toJSON())
+            publishEvent.publish("new-trip", newTrip.toJSON())
             return newTrip;
         } catch (e) {
             throw e
@@ -118,18 +115,18 @@ module.exports = {
             throw e;
         }
     },
-    async agentCancelTrip(tripId, agentId) {
+    async cancelTrip(tripId,cancelId) {
         try {
             return Trip.findOneAndUpdate({
                 "_id": tripId,
-            }, {"status": "cancel", "driverId_in_trip": "", "driverId_for_capture": ""}, {
+                "driverId_in_trip": driverId,
+                "status": {"$in": ["starttrip", "finish"]}
+            }, {"status": "finish", "driverId_in_trip": "", "driverId_for_capture": ""}, {
                 new: true,
+                sessionTrip
             });
         } catch (e) {
             throw e;
-        }
-        finally {
-
         }
     }
 }

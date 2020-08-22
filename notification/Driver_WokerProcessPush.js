@@ -1,6 +1,6 @@
 const RedisWrapper = require('../app/redis/RedisWrapper');
 
-const workerTrip = require("./AgentsNotification")
+const workerTrip = require("./Agents_WorkerPush")
 class WorkerProcessEvent {
     constructor() {
         RedisWrapper.sub.subscribe("new-trip");
@@ -10,7 +10,7 @@ class WorkerProcessEvent {
         RedisWrapper.sub.on("message", async function (channel, message) {
             switch (channel) {
                 case "new-trip": {
-                    await workerTrip.notifyWhenNewTripCreate(message);
+                    await workerTrip.createJobFoTheDriver(message);
                     break;
                 }
                 default : {
@@ -22,4 +22,5 @@ class WorkerProcessEvent {
     }
 
 }
+
 module.exports = {WorkerProcessEvent};
