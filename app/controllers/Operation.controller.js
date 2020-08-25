@@ -154,30 +154,35 @@ module.exports = {
         try {
             let listCarType = [
                 {
+                    "id":"26546650-e557-4a7b-86e7-6a3942445247",
                     "group": "TAXI",
                     "capacity": 7,
                     "display_name":"TAXI",
                     "description":"Không gian lớn, thích hợp cho nhóm"
                 },
                 {
+                    "id":"a1111c8c-c720-46c3-8534-2fcdd730040d",
                     "group": "TAXI",
                     "capacity": 4,
                     "display_name":"TAXI",
                     "description":"Không gian tối ưu"
                 },
                 {
+                    "id":"821415d8-3bd5-4e27-9604-194e4359a449",
                     "group": "SUV",
                     "capacity": 5,
                     "display_name":"SUV",
                     "description":"Sang trọng như ở nhà"
                 },
                 {
+                    "id":"57c0ff4e-1493-4ef9-a4df-6b961525cf92",
                     "group": "SUV",
                     "capacity": 7,
                     "display_name":"SUV",
                     "description":"Sang trọng như ở nhà"
                },
                 {
+                    "id":"d4abaae7-f4d6-4152-91cc-77523e8165a4",
                     "group": "SHARE",
                     "capacity": 2,
                     "display_name":"",
@@ -185,7 +190,7 @@ module.exports = {
                 },
             ];
             res.send({
-                "status": "ERROR",
+                "status": "OK",
                 "message": "",
                 "payload": listCarType
             });
