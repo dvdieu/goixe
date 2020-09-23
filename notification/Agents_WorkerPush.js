@@ -80,7 +80,7 @@ module.exports = {
             let tripId = data.id;
             let lat = data.from_lat;
             let long = data.from_lng;
-            let listDriver = await driverServices.near(long, lat, 10);//10
+            let listDriver = await driverServices.near(long, lat, 10000);//10
             if (listDriver === null || listDriver === undefined || listDriver.length === 0) {
                 //global.io.of("client").emit("");
                 //Tất cả tài xế đang bận
