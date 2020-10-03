@@ -78,6 +78,141 @@ module.exports = {
             });
         }
     },
+    meUpdate: async (req, res) => {
+        try {
+            let user = await driverServices.get(req.auth_info.data._id);
+            let infoUpdate = {
+                driver_name:((req.body.driver_name === undefined || req.body.driver_name ===null) ? user.driver_name: req.body.driver_name),
+                mobile:((req.body.mobile === undefined || req.body.mobile ===null) ? user.mobile: req.body.mobile),
+                address:((req.body.address === undefined || req.body.address ===null) ? user.address: req.body.address),
+                email:((req.body.email === undefined || req.body.email ===null) ? user.email: req.body.email),
+                image:((req.body.image === undefined || req.body.image ===null) ? user.image: req.body.image),
+            }
+            let userAfterUpdate = await driverServices.updateDriver(req.auth_info.data._id,infoUpdate);
+            if (userAfterUpdate) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": userAfterUpdate
+                });
+            } else {
+                res.send({
+                    "status": "ERROR",
+                    "message": "Login Error"
+                });
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": "Login Error"
+            });
+        }
+    },
+    updatePassword: async (req, res) => {
+        try {
+            let user = await driverServices.get(req.auth_info.data._id);
+            let infoUpdate = {
+                password:((req.body.password === undefined || req.body.password ===null) ? user.password: req.body.password)
+            }
+            let userAfterUpdate = await driverServices.updateDriver(req.auth_info.data._id,infoUpdate);
+            if (userAfterUpdate) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": userAfterUpdate
+                });
+            } else {
+                res.send({
+                    "status": "ERROR",
+                    "message": "Login Error"
+                });
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": "Login Error"
+            });
+        }
+    },
+    updateCarType: async (req, res) => {
+        try {
+            let user = await driverServices.get(req.auth_info.data._id);
+            let infoUpdate = {
+                car_type:((req.body.car_type === undefined || req.body.car_type ===null) ? user.car_type: req.body.car_type),
+                car_no:((req.body.car_no === undefined || req.body.car_no ===null) ? user.car_no: req.body.car_no)
+            }
+            let userAfterUpdate = await driverServices.updateDriver(req.auth_info.data._id,infoUpdate);
+            if (userAfterUpdate) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": userAfterUpdate
+                });
+            } else {
+                res.send({
+                    "status": "ERROR",
+                    "message": "Login Error"
+                });
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": "Login Error"
+            });
+        }
+    },
+    historyTripsFinish: async (req, res) => {
+        try {
+            let page = req.params.page;
+            let size = req.params.size;
+            let dateFrom = req.body.from;
+            let dateTo = req.body.to;
+            let historyFinish =await BookingServices.historyFinishOnFinish(req.auth_info.data._id,dateFrom,dateTo,page,size);
+            if (historyFinish) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": historyFinish
+                });
+            } else {
+                res.send({
+                    "status": "ERROR",
+                    "message": "Login Error"
+                });
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": "Login Error"
+            });
+        }
+    },
+    historyTripsCancel: async (req, res) => {
+        try {
+            let page = req.params.page;
+            let size = req.params.size;
+            let dateFrom = req.body.from;
+            let dateTo = req.body.to;
+            let historyFinish =await BookingServices.historyFinishOnCancel(req.auth_info.data._id,dateFrom,dateTo,page,size);
+            if (historyFinish) {
+                res.send({
+                    "status": "OK",
+                    "message": "successfull",
+                    "payload": historyFinish
+                });
+            } else {
+                res.send({
+                    "status": "ERROR",
+                    "message": "Login Error"
+                });
+            }
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": "Login Error"
+            });
+        }
+    },
     details: async (req, res) => {
         try {
             let user = await driverServices.get(req.params.id);

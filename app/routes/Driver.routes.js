@@ -8,6 +8,9 @@ router.post("/login",driverController.login);
 
 router.use(AuthMiddleWare.isAuth);
 router.get("/me",driverController.me);
+router.post("/me/update",driverController.meUpdate);
+router.post("/me/history/finish/page/:page/size/:size",driverController.historyTripsFinish);
+router.post("/me/history/cancel/page/:page/size/:size",driverController.historyTripsCancel);
 router.post("/gps",driverController.gps);
 router.get("/on",driverController.on);
 router.get("/off",driverController.off);

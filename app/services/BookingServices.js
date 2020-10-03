@@ -32,8 +32,8 @@ module.exports = {
                 if (driver && trip) {
                     let payload = {"driver": driver, "trip": trip};
                     await WorkerTrip.jobHasBeenReceived(trip.agent_id, payload);
-                    sessionTrip.commitTransaction();
-                    sessionDriver.commitTransaction();
+                    await sessionTrip.commitTransaction();
+                    await sessionDriver.commitTransaction();
                     return trip;
                 } else {
                     redis.del(bookingKey);
@@ -83,21 +83,19 @@ module.exports = {
         return -1;
     },
     async go(driverId, tripID) {
-        const sessionDriver = await mongoose.startSession();
         const sessionTrip = await mongoose.startSession();
         try {
             let driver = await driverServices.get(driverId);
             let trip = await tripServices.startTrip(tripID, driverId,sessionTrip);
             let payload = {"driver": driver, "trip": trip};
             if (driver && trip) {
+                await sessionTrip.startTransaction();
                 await WorkerTrip.startTrip(trip.agent_id, payload);
-                sessionDriver.commitTransaction();
-                sessionTrip.commitTransaction();
+                await sessionTrip.commitTransaction();
                 return trip;
             }
             throw Error(ERRORAPPLICATION.THE_TRIP_COMPLETED);
         } catch (e) {
-            sessionDriver.abortTransaction();
             sessionTrip.abortTransaction();
             throw e;
         }
@@ -107,12 +105,14 @@ module.exports = {
         const sessionDriver = await mongoose.startSession();
         const sessionTrip = await mongoose.startSession();
         try {
+            await sessionTrip.startTransaction();
+            await sessionDriver.startTransaction();
             let trip = await tripServices.finishTrip(tripID, driverId,sessionTrip)
             let driver = await driverServices.finishTrip(tripID, driverId,sessionDriver)
             if (trip && driver) {
                 await WorkerTrip.finishTrip(trip.agent_id, trip);
-                sessionDriver.commitTransaction();
-                sessionTrip.commitTransaction();
+                await sessionDriver.commitTransaction();
+                await sessionTrip.commitTransaction();
                 return trip;
             }
             throw Error(ERRORAPPLICATION.THE_TRIP_COMPLETED);
@@ -134,6 +134,28 @@ module.exports = {
                 }
             }
             return null;
+        } catch (e) {
+            throw e;
+        }
+    },
+    async historyFinishOnFinish(driverId, dateFrom, dateTo, page, size) {
+        try {
+            let driver = await driverServices.get(driverId);
+            if (driver) {
+                    return await tripServices.listTripForDriverOnFinish(driverId,dateFrom,dateTo,page,size);
+            }
+            throw Error(ERRORAPPLICATION.DRIVER_NOT_EXISTS);
+        } catch (e) {
+            throw e;
+        }
+    },
+    async historyFinishOnCancel(driverId, dateFrom, dateTo, page, size) {
+        try {
+            let driver = await driverServices.get(driverId);
+            if (driver) {
+                return await tripServices.listTripForDriverOnCancel(driverId,dateFrom,dateTo,page,size);
+            }
+            throw Error(ERRORAPPLICATION.DRIVER_NOT_EXISTS);
         } catch (e) {
             throw e;
         }

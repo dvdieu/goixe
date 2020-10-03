@@ -4,10 +4,11 @@ const publishEvent = require("../redis/pub");
 const SCHEDULE_JOB_NAME = require("../helps/SheduleJobName");
 const {addJobSchedule} = require("../helps/Scheduler");
 module.exports = {
+
     async scheduleTrip(payload) {
         try {
             let newTrip = await Trip.create(new Trip(payload));
-            await addJobSchedule(SCHEDULE_JOB_NAME.PROCESS_ON_SCHEDULE_TRIP,newTrip.schedule_time, JSON.stringify(newTrip));
+            await addJobSchedule(SCHEDULE_JOB_NAME.PROCESS_ON_SCHEDULE_TRIP, newTrip.schedule_time, JSON.stringify(newTrip));
             return newTrip;
         } catch (e) {
             throw e
@@ -92,7 +93,7 @@ module.exports = {
                 "_id": tripId,
                 "driverId_in_trip": driverId,
                 "status": {"$in": ["starttrip", "finish"]}
-            }, {"status": "finish", "driverId_in_trip": "", "driverId_for_capture": ""}, {
+            }, {"owner_finish": driverId, "status": "finish", "driverId_in_trip": "", "driverId_for_capture": ""}, {
                 new: true,
                 sessionTrip
             });
@@ -100,22 +101,44 @@ module.exports = {
             throw e;
         }
     },
+    /**
+     * Lấy danh sách trips dựa theo trạng thái,
+     * @param payload
+     * @returns {Promise<*>}
+     */
     async listTrip(status, dateFrom, dateTo, page, size) {
         page = page < 0 ? 0 : page;
         try {
-            if (status === null || status.length === 0)
-                return Trip.find({}).limit(parseInt(size)).skip(parseInt(size * page)).sort({"createdAt": -1});
-            return Trip.find({
-                "status": {"$in": status}, "createdAt": {
-                    $gte: Math.min(dateTo, dateFrom),
-                    $lte: Math.max(dateTo, dateFrom)
-                }
-            }).limit(parseInt(size)).skip(parseInt(size * page)).sort({"createdAt": -1});
+            let form = Math.min(dateFrom, dateTo);
+            let to = Math.max(dateFrom, dateTo);
+            let query ={"status": {"$in": status},
+                "createdAt": {
+                    "$gte": new Date(form).toISOString(),
+                    "$lte": new Date(to).toISOString()
+                }}
+            return Trip.find(query).limit(parseInt(size)).skip(parseInt(size * page)).sort({"createdAt": -1});
         } catch (e) {
             throw e;
         }
     },
-    async cancelTrip(tripId,cancelId) {
+    async listTripForDriverOnFinish(driverId, dateFrom, dateTo, page, size) {
+        page = page < 0 ? 0 : page;
+        try {
+            let form = Math.min(dateFrom, dateTo);
+            let to = Math.max(dateFrom, dateTo);
+            let query = {
+                "owner_finish":driverId,
+                "createdAt": {
+                    "$gte": new Date(form).toISOString(),
+                    "$lte": new Date(to).toISOString()
+                }
+            }
+            return Trip.find(query).limit(parseInt(size)).skip(parseInt(size * page)).sort({"createdAt": -1});
+        } catch (e) {
+            throw e;
+        }
+    },
+    async cancelTrip(tripId, cancelId) {
         try {
             return Trip.findOneAndUpdate({
                 "_id": tripId,
@@ -125,6 +148,23 @@ module.exports = {
                 new: true,
                 sessionTrip
             });
+        } catch (e) {
+            throw e;
+        }
+    },
+    listTripForDriverOnCancel(driverId, dateFrom, dateTo, page, size) {
+        page = page < 0 ? 0 : page;
+        try {
+            let form = Math.min(dateFrom, dateTo);
+            let to = Math.max(dateFrom, dateTo);
+            let query = {
+                "driverId_for_excluded":{"$in":[driverId]},
+                "createdAt": {
+                    "$gte": new Date(form).toISOString(),
+                    "$lte": new Date(to).toISOString()
+                }
+            }
+            return Trip.find(query).limit(parseInt(size)).skip(parseInt(size * page)).sort({"createdAt": -1});
         } catch (e) {
             throw e;
         }
