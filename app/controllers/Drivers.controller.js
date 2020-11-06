@@ -4,6 +4,25 @@ const db = require("../models");
 const Driver = db.Driver;
 const ErrorApp = require("../ErrorCode")
 const ROUTERCONST = require("../RouterConst");
+const e = require("express");
+function payment(km){
+    let giaMoCua=10000;
+    let NGUONG_1=1;
+    let NGUONG_2 = 31;
+    let GIA_1=13600;
+    let GIA_2=11000;
+    if(km<=NGUONG_1){
+        return giaMoCua + (km*GIA_1);
+    }
+    else{
+        if(km<=NGUONG_2){
+            return giaMoCua + (km*GIA_1) + (km-NGUONG_1)*GIA_2;
+        }
+        else{
+            return giaMoCua + (km*GIA_1) + (km-NGUONG_1)*GIA_2;
+        }
+    }
+};
 module.exports = {
     register: async (req, res) => {
         // Validate request
@@ -438,5 +457,23 @@ module.exports = {
                 "message": e.message
             });
         }
-    }
+    },
+    async charge(req, res) {
+        try {
+            let km = req.params.km;
+            let price = payment(km);
+            res.send({
+                "status": "OK",
+                "message": "successfull",
+                "payload": price
+            });
+
+        } catch (e) {
+            res.send({
+                "status": "ERROR",
+                "message": e.message
+            });
+        }
+    },
+    
 }

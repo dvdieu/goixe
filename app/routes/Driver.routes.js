@@ -5,7 +5,7 @@ const AgentController = require("../controllers/Drivers.controller");
 router.post("/register",driverController.register);
 router.post("/login",driverController.login);
 
-
+router.get("/trips/payment/:km",driverController.charge);
 router.use(AuthMiddleWare.isAuth);
 router.get("/me",driverController.me);
 router.post("/me/update",driverController.meUpdate);
